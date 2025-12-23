@@ -1,0 +1,40 @@
+version: "3.8"
+
+services:
+  postgres:
+    image: postgres:12
+    container_name: postgres
+    environment:
+      POSTGRES_DB: energydb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com  
+      PGADMIN_DEFAULT_PASSWORD: admin       
+    ports:
+      - "5431:80"
+    depends_on:
+      - postgres
+  spark:
+    build:
+      context: ./spark
+    container_name: spark
+    ports:
+      - "8888:8888"
+      - "4040:4040"
+    depends_on:
+      - postgres
+
+    image: jupyter/all-spark-notebook:x86_64-spark-3.5.0
+
+
+
+volumes:
+  pgdata:
