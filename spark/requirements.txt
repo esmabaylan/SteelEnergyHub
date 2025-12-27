@@ -1,8 +1,0 @@
-pandas
-numpy
-psycopg2-binary
-sqlalchemy
-kafka-python
-scikit-learn
-xgboost
-matplotlib

@@ -1,0 +1,1 @@
+-- data integraty constraints for tables

@@ -1,79 +1,89 @@
-### SteelEnergyHub
 
-SteelEnergyHub is a smart energy management platform for steel factories, supporting real-time monitoring, anomaly detection, and consumption forecasting. The project leverages Kafka, Spark Structured Streaming, Docker, PostgreSQL, and visualization tools like Streamlit or Grafana.
+# SteelEnergyHub
 
-## Features
+SteelEnergyHub is an end-to-end data engineering project designed to analyze, process, and model energy consumption data within the steel industry.
 
-Real-time energy data collection and processing
+This project utilizes Apache Spark, PostgreSQL, and Docker technologies, operating within an isolated and scalable development environment (Dev Container).
 
-Anomaly detection to identify irregular energy usage
+## Project Architecture and Technology Stack
 
-Energy consumption prediction and analytics
+* **Programming Language:** Python 3.11
+* **Data Processing:** Apache Spark 3.5.0 (PySpark)
+* **Database:** PostgreSQL 15 (TimescaleDB Image)
+* **Infrastructure:** Docker & VS Code Dev Containers
+* **Development Environment:** Jupyter Notebooks & Visual Studio Code
 
-Dashboard visualization (Grafana / Streamlit)
+## Setup Instructions
 
+Please follow the steps below in order to run the project in your local environment.
 
-## System Requirements
+### Prerequisites
 
-Docker
+* Docker Desktop (Must be active/running)
+* Visual Studio Code
+* VS Code Extension: Dev Containers (Microsoft)
 
-Docker Compose
+### 1. Cloning the Project
 
-Python 3.11+
+Clone the project to your local directory via the terminal:
 
-
-## Docker Images
-
-The platform’s core components can be run using the following Docker images:
-
-PgAdmin:
-
-docker pull dpage/pgadmin4:snapshot
-
-
-PostgreSQL:
-
-docker pull postgres:16.11-alpine3.23
-
-
-Apache Spark Notebook:
-
-docker pull jupyter/all-spark-notebook:x86_64-python-3.11
-
-## Installation
-
-Clone the repository:
-
-git clone <repository-url>
+```bash
+git clone [https://github.com/YOUR_USERNAME/SteelEnergyHub.git](https://github.com/YOUR_USERNAME/SteelEnergyHub.git)
 cd SteelEnergyHub
 
-Start all services using Docker Compose:
+```
 
-docker compose up -d
+### 2. Database Setup (Critical Step)
+
+Before initializing the development environment (Dev Container), the PostgreSQL database must be running externally on Docker. Execute the following command in your terminal to start the database:
+
+```bash
+docker run -d \
+    --name postgres \
+    -p 5435:5432 \
+    -e POSTGRES_PASSWORD=postgres \
+    -e POSTGRES_DB=energydb \
+    postgres:15
+
+```
+
+*Note: The database will be exposed on port `5435` on the local machine.*
+
+### 3. Initializing the Development Environment (Dev Container)
+
+1. Open Visual Studio Code.
+2. Press `F1` to open the command palette and select **"Dev Containers: Reopen in Container"**.
+3. VS Code will automatically build and start the Spark and Python environment defined for the project.
+
+## Project Directory Structure
+
+```text
+STEELENERGYHUB
+├── .devcontainer/          # Docker image and VS Code environment configuration
+│   ├── Dockerfile          # Spark and Python environment definition
+│   ├── devcontainer.json   # VS Code configuration file
+│   └── requirements.txt    # Project dependencies (PySpark, Psycopg2, etc.)
+├── config/                 # Configuration files
+├── data/                   # Raw and processed data
+├── spark/                  # Spark jobs and source code
+├── tests/                  # Test scenarios
+│   └── test_db.py          # Database test
+└── README.md               # Project documentation
+
+```
 
 
-Configure PgAdmin and PostgreSQL connections.
+## Database Connection Configuration
 
-Start the Spark pipeline and monitor data flow.
+The following parameters are used to access the external PostgreSQL server (running on Docker Desktop) from within the Dev Container:
 
-Launch the dashboard (Grafana/Streamlit) for visualization.
+* **Host:** `host.docker.internal` (Container gateway)
+* **Port:** `5435` (External port mapped on Docker)
+* **User:** `postgres`
+* **Password:** `postgres`
+* **Database Name:** `energydb`
 
-Project Structure
-SteelEnergyHub/
-│
-├─ docker/                 # Docker Compose and service configurations
-├─ spark/                  # Spark Structured Streaming scripts
-├─ postgres/               # PostgreSQL configurations
-├─ dashboards/             # Grafana / Streamlit dashboards
-├─ requirements.txt        # Python dependencies
-└─ README.md
+## Developer Notes
 
-Contribution
+If any changes are made to the project dependencies (libraries), the `.devcontainer/requirements.txt` file must be updated, and the **"Rebuild Container"** action must be performed via VS Code to apply the changes.
 
-Pull requests are welcome.
-
-All contributions should adhere to code quality standards and the existing architecture.
-
-License
-
-This project is licensed under the MIT License.
