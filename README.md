@@ -28,7 +28,7 @@ Please follow the steps below in order to run the project in your local environm
 Clone the project to your local directory via the terminal:
 
 ```bash
-git clone [https://github.com/YOUR_USERNAME/SteelEnergyHub.git](https://github.com/YOUR_USERNAME/SteelEnergyHub.git)
+git clone [https://github.com/esmabaylan/SteelEnergyHub.git](https://github.com/esmabaylan/SteelEnergyHub.git)
 cd SteelEnergyHub
 
 ```

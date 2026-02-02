@@ -2,7 +2,13 @@ services:
   postgres:
     image: timescale/timescaledb:latest-pg12
     container_name: postgres
-    command: postgres -c shared_preload_libraries=timescaledb
+    command:
+      postgres
+      -c shared_preload_libraries=timescaledb
+      -c archive_mode=on
+      -c archive_command=test\ \!\ -f\ /wal_archive/%f\ \&\&\ cp\ %p\ /wal_archive/%f
+      -c archive_timeout=60
+      -c huge_pages=off
     environment:
       POSTGRES_DB: energydb
       POSTGRES_USER: postgres
@@ -11,6 +17,7 @@ services:
       - "5435:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - wal_archive:/wal_archive
 
   pgadmin:
     image: dpage/pgadmin4
@@ -35,8 +42,10 @@ services:
       --ServerApp.password=''
       --ServerApp.allow_origin='*'
       --ip=0.0.0.0
+      
     depends_on:
       - postgres
 
 volumes:
   pgdata:
+  wal_archive:
