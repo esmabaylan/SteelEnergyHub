@@ -1,12 +1,10 @@
 {
     "name": "Spark & Postgres Dev Env",
-    "build": {
-        "dockerfile": "Dockerfile",
-        "context": "."
-    },
-    "remoteUser": "jovyan",
+    "dockerComposeFile": "docker-compose.yml",
+    "service": "spark",
     "workspaceFolder": "/home/jovyan/work",
-    "workspaceMount": "source=${localWorkspaceFolder},target=/home/jovyan/work,type=bind",
+    "remoteUser": "jovyan",
+
     "customizations": {
         "vscode": {
             "settings": {

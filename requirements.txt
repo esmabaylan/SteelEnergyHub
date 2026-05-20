@@ -7,3 +7,5 @@ scikit-learn
 xgboost
 matplotlib
 pytest
+pyspark
+flask

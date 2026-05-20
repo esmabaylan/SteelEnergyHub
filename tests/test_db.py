@@ -1,47 +1,57 @@
-# Test DB conncections and queries
 import pytest
 import psycopg2
 
-def test_db_connection():
-    """Test database connection."""
-    try:
-        conn = psycopg2.connect(
-            dbname="energydb",
-            user="postgres",
-            password="postgres",
-            host="host.docker.internal",
-            port="5435"
-           # host="localhost",
-           # port="5432"
-        )
-        return conn
-    except Exception as e:
-        pytest.fail(f"Database connection failed: {e}")
+@pytest.fixture
+def db_connection():
+    conn = psycopg2.connect(
+        dbname="energydb",
+        user="postgres",
+        password="postgres",
+        host="host.docker.internal", 
+        port="5435"
+    )
+    
+
+    cursor = conn.cursor()
+    cursor.execute("DROP TABLE IF EXISTS energy_metrics;")
+    cursor.execute("""
+        CREATE TABLE energy_metrics (
+            id SERIAL PRIMARY KEY, 
+            metric_name VARCHAR(50), 
+            metric_value FLOAT
+        );
+    """)
+    conn.commit()
+
+    # 2. MENTÖRLÜK: yield, bağlantıyı teste verir, test bitince alt satırdan çalışmaya devam eder.
+    yield conn  
+
+    # Temizlik (Teardown): Test bittikten sonra bağlantıyı kapatıyoruz.
+    conn.close()
 
 
-def test_db_creation():
-    """Test database creation."""
-    try:
-        conn = test_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("CREATE TABLE IF NOT EXISTS energy_metrics (id SERIAL PRIMARY KEY, metric_name VARCHAR(50), metric_value FLOAT);")
-        conn.commit()
-        print("Database table creation successful.")
-        conn.close()
-    except Exception as e:
-        pytest.fail(f"Database table creation failed: {e}")
+# 3. MENTÖRLÜK: Test fonksiyonları 'test_' ile başlar ve bağımsız (izole) olmalıdır.
+def test_db_insertion_and_query(db_connection):
+    """Veri ekleme ve o veriyi çekme işlemini test eder."""
+    
+    # db_connection fixture'ı otomatik olarak bu teste parametre olarak geldi.
+    cursor = db_connection.cursor()
 
-def test_db_query():
-    """Test database query."""
-    try:
-        conn = test_db_connection()
-        cursor = conn.cursor()
-        cursor.execute("SELECT * FROM energy_metrics;")
-        print(cursor.fetchall())
-        print("Database query successful.")
-        conn.close()
-    except Exception as e:
-        pytest.fail(f"Database query failed: {e}")
+    # Eylem (Act): Veritabanına test verisi ekle
+    test_metric_name = "cpu_usage"
+    test_metric_value = 85.5
+    cursor.execute(
+        "INSERT INTO energy_metrics (metric_name, metric_value) VALUES (%s, %s);", 
+        (test_metric_name, test_metric_value)
+    )
+    db_connection.commit()
 
-if __name__ == "__main__":
-    test_db_creation()
+    # Eylem (Act): Eklenen veriyi geri çek
+    cursor.execute("SELECT metric_name, metric_value FROM energy_metrics WHERE metric_name = %s;", (test_metric_name,))
+    result = cursor.fetchone()
+
+    # 4. MENTÖRLÜK: Assert kullanımı. Pytest'in kalbi burasıdır.
+    # Burada try-except kullanmıyoruz. Eğer veri dönmezse assert None'da patlar ve hatayı görürüz.
+    assert result is not None, "Veritabanından sorgulanan kayıt dönmedi!"
+    assert result[0] == test_metric_name, f"Beklenen metrik ismi '{test_metric_name}', ancak '{result[0]}' geldi."
+    assert result[1] == test_metric_value, "Veritabanına yazılan sayısal değer bozulmuş veya yanlış gelmiş."
