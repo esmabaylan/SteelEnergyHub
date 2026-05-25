@@ -1,89 +1,190 @@
 
 # SteelEnergyHub
 
-SteelEnergyHub is an end-to-end data engineering project designed to analyze, process, and model energy consumption data within the steel industry.
+SteelEnergyHub is an end-to-end data engineering platform that analyzes real-time energy consumption data in the steel industry, performing anomaly detection and cost optimization.
 
-This project utilizes Apache Spark, PostgreSQL, and Docker technologies, operating within an isolated and scalable development environment (Dev Container).
+## Project Architecture
 
-## Project Architecture and Technology Stack
+```
+CSV Data
+    ↓
+TimescaleDB (main_data.energy_readings)
+    ↓
+Kafka Producer (energy_producer.py)
+    ↓
+Apache Kafka (energy_raw topic)
+    ↓
+Spark Structured Streaming (energy_streaming.py)
+    ↓
+TimescaleDB
+├── main_data.anomalies       (detected anomalies)
+└── main_data.cost_analysis   (tariff-based cost records)
+    ↓
+Grafana Dashboard
+```
 
-* **Programming Language:** Python 3.11
-* **Data Processing:** Apache Spark 3.5.0 (PySpark)
-* **Database:** PostgreSQL 15 (TimescaleDB Image)
-* **Infrastructure:** Docker & VS Code Dev Containers
-* **Development Environment:** Jupyter Notebooks & Visual Studio Code
+## Technology Stack
 
-## Setup Instructions
+| Layer | Technology |
 
-Please follow the steps below in order to run the project in your local environment.
+| Programming Language | Python 3.11 |
+
+| Stream Processing | Apache Spark 3.5.0 (PySpark) |
+
+| Message Queue | Apache Kafka |
+
+| Database | PostgreSQL 15 + TimescaleDB |
+
+| Visualization | Grafana |
+
+| Infrastructure | Docker & Docker Compose |
+
+| Development Environment | VS Code Dev Containers + Jupyter |
+
+## Service URLs
+
+| Service | URL |
+
+| Jupyter Notebook | http://localhost:8888 |
+
+| Kafka UI | http://localhost:8090 |
+
+| Grafana | http://localhost:3000 |
+
+| pgAdmin | http://localhost:8085 |
+
+| TimescaleDB | localhost:5432 |
+
+## Setup
 
 ### Prerequisites
 
-* Docker Desktop (Must be active/running)
-* Visual Studio Code
-* VS Code Extension: Dev Containers (Microsoft)
+- Docker Desktop (must be running)
+- Visual Studio Code
+- VS Code Extension: Dev Containers (Microsoft)
 
-### 1. Cloning the Project
-
-Clone the project to your local directory via the terminal:
+### 1. Clone the Repository
 
 ```bash
-git clone [https://github.com/esmabaylan/SteelEnergyHub.git](https://github.com/esmabaylan/SteelEnergyHub.git)
+git clone https://github.com/esmabaylan/SteelEnergyHub.git
 cd SteelEnergyHub
-
 ```
 
-### 2. Database Setup (Critical Step)
+### 2. Start Core Services
 
-Before initializing the development environment (Dev Container), the PostgreSQL database must be running externally on Docker. Execute the following command in your terminal to start the database:
+Run the main `docker-compose.yml` to start Kafka, TimescaleDB, pgAdmin, and Grafana:
 
 ```bash
-docker run -d \
-    --name postgres \
-    -p 5435:5432 \
-    -e POSTGRES_PASSWORD=postgres \
-    -e POSTGRES_DB=energydb \
-    postgres:15
-
+docker compose up -d
 ```
 
-*Note: The database will be exposed on port `5435` on the local machine.*
+Verify all services are healthy:
 
-### 3. Initializing the Development Environment (Dev Container)
+```bash
+docker compose ps
+```
 
-1. Open Visual Studio Code.
-2. Press `F1` to open the command palette and select **"Dev Containers: Reopen in Container"**.
-3. VS Code will automatically build and start the Spark and Python environment defined for the project.
+The `timescaledb` row should show `healthy`.
 
-## Project Directory Structure
+### 3. Open the Development Environment
 
-```text
+In VS Code, press `Ctrl+Shift+P` → select **"Dev Containers: Reopen in Container"**.
+
+VS Code will automatically build and start the Spark and Python environment.
+
+> **Important:** Always run `docker compose up -d` before opening the Dev Container. The Dev Container connects to the `steelenergy_network` created by the main compose file.
+
+### 4. Load the Dataset
+
+In the Dev Container terminal:
+
+```bash
+python scripts/load_data.py
+```
+
+### 5. Start the Kafka Producer
+
+```bash
+python src/producer/energy_producer.py
+```
+
+### 6. Start Spark Streaming
+
+Open a new terminal:
+
+```bash
+python spark/streaming/energy_streaming.py
+```
+
+## Project Structure
+
+```
 STEELENERGYHUB
-├── .devcontainer/          # Docker image and VS Code environment configuration
-│   ├── Dockerfile          # Spark and Python environment definition
-│   ├── devcontainer.json   # VS Code configuration file
-│   └── requirements.txt    # Project dependencies (PySpark, Psycopg2, etc.)
-├── config/                 # Configuration files
-├── data/                   # Raw and processed data
-├── spark/                  # Spark jobs and source code
-├── tests/                  # Test scenarios
-│   └── test_db.py          # Database test
-└── README.md               # Project documentation
-
+├── .devcontainer/
+│   ├── Dockerfile              # Spark + Python environment
+│   ├── devcontainer.json       # VS Code configuration
+│   └── docker-compose.yml      # Spark service
+├── config/                     # Configuration files
+├── data/
+│   └── raw/                    # Raw CSV data
+├── database/
+│   ├── init/                   # Docker init SQL files
+│   ├── migrations/             # Schema versions
+│   └── config/                 # PostgreSQL configuration
+├── notebooks/
+│   └── 01_data_exploration.ipynb
+├── spark/
+│   └── streaming/
+│       └── energy_streaming.py # Kafka → Spark → DB pipeline
+├── src/
+│   └── producer/
+│       └── energy_producer.py  # DB → Kafka producer
+├── scripts/
+│   └── load_data.py            # CSV → DB loader
+├── tests/
+│   └── test_db.py
+├── docker-compose.yml          # Core services
+└── README.md
 ```
 
+## Database Schema
 
-## Database Connection Configuration
+```
+energydb
+└── main_data (schema)
+    ├── energy_readings   → raw energy data (hypertable)
+    ├── anomalies         → detected anomalies (hypertable)
+    └── cost_analysis     → tariff-based cost records (hypertable)
+```
 
-The following parameters are used to access the external PostgreSQL server (running on Docker Desktop) from within the Dev Container:
+## Connection Details
 
-* **Host:** `host.docker.internal` (Container gateway)
-* **Port:** `5435` (External port mapped on Docker)
-* **User:** `postgres`
-* **Password:** `postgres`
-* **Database Name:** `energydb`
+### TimescaleDB
+| Parameter | Value |
+
+| Host (inside Docker) | timescaledb |
+
+| Host (from host machine) | localhost |
+
+| Port | 5432 |
+
+| Database | energydb |
+
+| Write user | data_writer |
+
+| Read user | report_reader |
+
+### Grafana
+| Parameter | Value |
+
+| URL | http://localhost:3000 |
+
+| Username | admin |
+
+| Datasource | PostgreSQL → timescaledb:5432 |
 
 ## Developer Notes
 
-If any changes are made to the project dependencies (libraries), the `.devcontainer/requirements.txt` file must be updated, and the **"Rebuild Container"** action must be performed via VS Code to apply the changes.
-
+- If dependencies change, update `.devcontainer/Dockerfile` and run **"Rebuild Container"**.
+- Migration files are versioned under `database/migrations/` in `V001__`, `V002__` format.
+- Core services must always be started before opening the Dev Container.

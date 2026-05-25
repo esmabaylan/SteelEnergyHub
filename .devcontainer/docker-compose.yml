@@ -1,41 +1,6 @@
 version: '3.8'
 
 services:
-  postgres:
-    image: timescale/timescaledb:latest-pg12
-    container_name: postgres_dev
-    command: >
-      postgres
-      -c shared_preload_libraries=timescaledb
-      -c archive_mode=on
-      -c archive_command="test ! -f /wal_archive/%f && cp %p /wal_archive/%f"
-      -c archive_timeout=60
-      -c huge_pages=off
-    environment:
-      POSTGRES_DB: energydb
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-    ports:
-      - "5435:5432"
-    volumes:
-      - pgdata:/var/lib/postgresql/data
-      - wal_archive:/wal_archive
-    networks:
-      - steelenergy_network
-
-  pgadmin:
-    image: dpage/pgadmin4
-    container_name: pgadmin_dev
-    environment:
-      PGADMIN_DEFAULT_EMAIL: admin@admin.com
-      PGADMIN_DEFAULT_PASSWORD: admin
-    ports:
-      - "5431:80"
-    depends_on:
-      - postgres
-    networks:
-      - steelenergy_network
-
   spark:
     build: 
       context: ..
@@ -53,15 +18,9 @@ services:
       --ServerApp.password=''
       --ServerApp.allow_origin='*'
       --ip=0.0.0.0
-    depends_on:
-      - postgres
     networks:
       - steelenergy_network
-
-volumes:
-  pgdata:
-  wal_archive:
-
+      
 networks:
   steelenergy_network:
     external: true

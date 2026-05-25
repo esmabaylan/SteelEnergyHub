@@ -7,9 +7,10 @@ BEGIN
 END
 $$;
 
--- Yazara şema kullanım yetkisi ver
 GRANT USAGE ON SCHEMA main_data TO data_writer;
 GRANT INSERT, UPDATE, SELECT ON ALL TABLES IN SCHEMA main_data TO data_writer;
+ALTER DEFAULT PRIVILEGES IN SCHEMA main_data
+    GRANT INSERT, UPDATE, SELECT ON TABLES TO data_writer;
 
 -- 2. Grafana veya Raporlama için sadece OKUYAN kullanıcı
 DO $$
@@ -20,13 +21,12 @@ BEGIN
 END
 $$;
 
--- Okuyucuya sadece SELECT yetkisi ver (Veriyi bozamaz)
-GRANT USAGE ON SCHEMA analytics TO report_reader;
-GRANT SELECT ON ALL TABLES IN SCHEMA analytics TO report_reader;
-
--- Gelecekte oluşturulacak tablolar için varsayılan yetkiler
+GRANT USAGE ON SCHEMA main_data TO report_reader;
+GRANT SELECT ON ALL TABLES IN SCHEMA main_data TO report_reader;
 ALTER DEFAULT PRIVILEGES IN SCHEMA main_data
-GRANT INSERT, UPDATE, SELECT ON TABLES TO data_writer;
+    GRANT SELECT ON TABLES TO report_reader;
 
+-- analytics şeması için de okuma yetkisi (ileride view'lar buraya gelecek)
+GRANT USAGE ON SCHEMA analytics TO report_reader;
 ALTER DEFAULT PRIVILEGES IN SCHEMA analytics
-GRANT SELECT ON TABLES TO report_reader;
+    GRANT SELECT ON TABLES TO report_reader;

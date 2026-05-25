@@ -3,9 +3,7 @@ numpy
 psycopg2-binary
 sqlalchemy
 kafka-python
-scikit-learn
-xgboost
 matplotlib
 pytest
-pyspark
 flask
+confluent-kafka
