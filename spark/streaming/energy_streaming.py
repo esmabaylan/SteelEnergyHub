@@ -47,14 +47,34 @@ schema = StructType([
     StructField("week_status",            StringType()),
     StructField("day_of_week",            StringType()),
     StructField("load_type",              StringType()),
+    # Yeni özellikler
+    StructField("hour",                   IntegerType()),
+    StructField("day",                    IntegerType()),
+    StructField("month",                  IntegerType()),
+    StructField("quarter",                IntegerType()),
+    StructField("is_weekend",             BooleanType()),
+    StructField("shift",                  StringType()),
+    StructField("tariff_period",          StringType()),
+    StructField("day_period",             StringType()),
+    StructField("usage_ma_1h",            DoubleType()),
+    StructField("usage_ma_4h",            DoubleType()),
+    StructField("usage_diff",             DoubleType()),
+    StructField("usage_pct_change",       DoubleType()),
+    StructField("pf_efficiency",          DoubleType()),
+    StructField("reactive_power_balance", DoubleType()),
+    StructField("low_pf_flag",            BooleanType()),
+    StructField("z_score",                DoubleType()),
+    StructField("z_anomaly",              BooleanType()),
+    StructField("cost_tl",                DoubleType()),
+    StructField("cost_saving",            DoubleType()),
 ])
-
 
 df_raw = spark.readStream \
     .format("kafka") \
     .option("kafka.bootstrap.servers", "kafka:9092") \
-    .option("subscribe", "energy_topic") \
+    .option("subscribe", "energy_raw") \
     .option("startingOffsets", "latest") \
+    .option("failOnDataLoss", "false") \
     .load()
 
 
@@ -93,30 +113,12 @@ def process_batch(batch_df, batch_id):
     conn = psycopg2.connect(**DB_CONFIG)
     cur = conn.cursor()
 
-
-    energy_rows = [
-        (r["time"], r["usage_kwh"], r["lagging_reactive_power"],
-         r["leading_reactive_power"], r["co2_tco2"], r["lagging_pf"],
-         r["leading_pf"], r["nsm"], r["week_status"],
-         r["day_of_week"], r["load_type"])
-        for r in rows if r["time"] is not None
-    ]
-
-    if energy_rows:
-        execute_batch(cur, """
-            INSERT INTO main_data.energy_readings
-            (time, usage_kwh, lagging_reactive_power, leading_reactive_power,
-             co2_tco2, lagging_pf, leading_pf, nsm, week_status, day_of_week, load_type)
-            VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
-            ON CONFLICT DO NOTHING
-        """, energy_rows)
-
-
+    # Anomalileri yaz
     anomaly_rows = [
         (r["time"], r["usage_kwh"], r["z_score"], r["load_type"])
         for r in rows
-        if r["time"] is not None and r["z_score"] is not None
-        and abs(r["z_score"]) > Z_THRESHOLD
+        if r["time"] is not None
+        and r["z_anomaly"] is True
     ]
 
     if anomaly_rows:
@@ -126,12 +128,12 @@ def process_batch(batch_df, batch_id):
             VALUES (%s,%s,%s,%s)
             ON CONFLICT DO NOTHING
         """, anomaly_rows)
-        print(f"  [Batch {batch_id}] {len(anomaly_rows)} anomalies detected!")
 
-
+    # Maliyet analizini yaz — tariff_type Spark'ta hesaplanıyor
     cost_rows = [
         (r["time"], r["usage_kwh"], r["tariff_type"], r["cost_tl"], r["load_type"])
-        for r in rows if r["time"] is not None
+        for r in rows
+        if r["time"] is not None and r["cost_tl"] is not None
     ]
 
     if cost_rows:
@@ -146,11 +148,10 @@ def process_batch(batch_df, batch_id):
     cur.close()
     conn.close()
 
-    print(f"  [Batch {batch_id}] {len(energy_rows)} rows processed | "
-          f"{len(anomaly_rows)} anomalies | "
-          f"{len(cost_rows)} cost records")
-
-
+    print(f"  [Batch {batch_id}] {len(rows)} satır | "
+          f"{len(anomaly_rows)} anomali | "
+          f"{len(cost_rows)} maliyet")
+    
 
 query = df.writeStream \
     .outputMode("append") \

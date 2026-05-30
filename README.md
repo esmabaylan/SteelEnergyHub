@@ -129,20 +129,30 @@ STEELENERGYHUB
 │   └── raw/                    # Raw CSV data
 ├── database/
 │   ├── init/                   # Docker init SQL files
-│   ├── migrations/             # Schema versions
+│   ├── migrations/             # Schema versions (V001, V002, V003)
 │   └── config/                 # PostgreSQL configuration
 ├── notebooks/
-│   └── 01_data_exploration.ipynb
+│   ├── 01_data_exploration.ipynb
+│   └── 02_feature_engineering.ipynb
 ├── spark/
 │   └── streaming/
-│       └── energy_streaming.py # Kafka → Spark → DB pipeline
+│       ├── energy_streaming.py # Kafka → Spark → DB pipeline
+│       └── kafka_consumer.py   # Kafka consumer test
 ├── src/
+│   ├── anomaly/                # Anomaly detection modules
+│   ├── cost/                   # Cost analysis modules
+│   ├── pipelines/
+│   │   └── feature_pipeline.py # energy_readings → processed_readings
 │   └── producer/
-│       └── energy_producer.py  # DB → Kafka producer
+│       ├── energyProducer.py   # processed_readings → Kafka
+│       └── generate_dummy_data.py # Synthetic data generator
 ├── scripts/
 │   └── load_data.py            # CSV → DB loader
 ├── tests/
-│   └── test_db.py
+│   ├── test_db.py
+│   ├── test_dummy_data.py
+│   ├── test_producer.py
+│   └── test_streaming_job.py
 ├── docker-compose.yml          # Core services
 └── README.md
 ```
@@ -152,9 +162,10 @@ STEELENERGYHUB
 ```
 energydb
 └── main_data (schema)
-    ├── energy_readings   → raw energy data (hypertable)
-    ├── anomalies         → detected anomalies (hypertable)
-    └── cost_analysis     → tariff-based cost records (hypertable)
+├── energy_readings     → raw energy data (hypertable)
+├── processed_readings  → feature engineered data (hypertable)
+├── anomalies           → detected anomalies (hypertable)
+└── cost_analysis       → tariff-based cost records (hypertable)
 ```
 
 ## Connection Details

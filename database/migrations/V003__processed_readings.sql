@@ -1,0 +1,39 @@
+CREATE TABLE IF NOT EXISTS main_data.processed_readings (
+    time                    TIMESTAMPTZ      NOT NULL,
+    usage_kwh               DOUBLE PRECISION,
+    lagging_reactive_power  DOUBLE PRECISION,
+    leading_reactive_power  DOUBLE PRECISION,
+    co2_tco2                DOUBLE PRECISION,
+    lagging_pf              DOUBLE PRECISION,
+    leading_pf              DOUBLE PRECISION,
+    nsm                     INTEGER,
+    week_status             TEXT,
+    day_of_week             TEXT,
+    load_type               TEXT,
+    hour                    SMALLINT,
+    day                     SMALLINT,
+    month                   SMALLINT,
+    quarter                 SMALLINT,
+    is_weekend              BOOLEAN,
+    shift                   TEXT,
+    tariff_period           TEXT,
+    day_period              TEXT,
+    usage_ma_1h             DOUBLE PRECISION,
+    usage_ma_4h             DOUBLE PRECISION,
+    usage_diff              DOUBLE PRECISION,
+    usage_pct_change        DOUBLE PRECISION,
+    pf_efficiency           DOUBLE PRECISION,
+    reactive_power_balance  DOUBLE PRECISION,
+    low_pf_flag             BOOLEAN,
+    z_score                 DOUBLE PRECISION,
+    z_anomaly               BOOLEAN,
+    cost_tl                 DOUBLE PRECISION,
+    cost_saving             DOUBLE PRECISION
+);
+
+CREATE INDEX IF NOT EXISTS idx_processed_load_type 
+ON main_data.processed_readings (load_type, time DESC);
+CREATE INDEX IF NOT EXISTS idx_processed_shift 
+ON main_data.processed_readings (shift, time DESC);
+CREATE INDEX IF NOT EXISTS idx_processed_tariff 
+ON main_data.processed_readings (tariff_period, time DESC);

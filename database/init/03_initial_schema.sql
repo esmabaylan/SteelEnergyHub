@@ -1,5 +1,3 @@
-CREATE EXTENSION IF NOT EXISTS timescaledb;
-
 CREATE TABLE IF NOT EXISTS main_data.energy_readings (
     time                    TIMESTAMPTZ      NOT NULL,
     usage_kwh               DOUBLE PRECISION,
@@ -13,6 +11,3 @@ CREATE TABLE IF NOT EXISTS main_data.energy_readings (
     day_of_week             TEXT,
     load_type               TEXT
 );
-
-CREATE INDEX IF NOT EXISTS idx_energy_load_type 
-ON main_data.energy_readings (load_type, time DESC);

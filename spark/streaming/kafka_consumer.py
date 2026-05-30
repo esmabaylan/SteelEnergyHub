@@ -28,8 +28,9 @@ schema = StructType([
 df_raw = spark.readStream \
     .format("kafka") \
     .option("kafka.bootstrap.servers", "kafka:9092") \
-    .option("subscribe", "energy_topic") \
+    .option("subscribe", "energy_raw") \
     .option("startingOffsets", "earliest") \
+    .option("failOnDataLoss", "false") \
     .load()
 
 df_parsed = df_raw \

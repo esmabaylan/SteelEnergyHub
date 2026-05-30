@@ -17,6 +17,9 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"  
+    volumes:
+      - kafka_data:/var/lib/kafka/data         
     networks:
       - steelenergy_network
 
@@ -34,25 +37,24 @@ services:
       - steelenergy_network
 
   timescaledb:                                       
-    image: timescale/timescaledb:latest-pg15         
-    container_name: timescaledb                      
-    ports:                                           
-      - "5432:5432"                                  
-    environment:                                     
-      POSTGRES_USER: postgres                        
-      POSTGRES_PASSWORD: postgres                    
-      POSTGRES_DB: energydb                          
-    volumes:                                         
-      - timescale_data:/var/lib/postgresql/data      
+      image: timescale/timescaledb:latest-pg15         
+      container_name: timescaledb                      
+      ports:                                           
+        - "5432:5432"                                  
+      environment:                                     
+        POSTGRES_USER: postgres                        
+        POSTGRES_PASSWORD: postgres                    
+        POSTGRES_DB: energydb                          
+      volumes:
+      - timescale_data:/var/lib/postgresql/data
       - ./database/init:/docker-entrypoint-initdb.d
-      - ./database/migrations:/migrations 
-    healthcheck:                                     
-      test: ["CMD-SHELL", "pg_isready -U postgres"]  
-      interval: 10s                                  
-      timeout: 5s                                    
-      retries: 5                                     
-    networks:                                        
-      - steelenergy_network   
+      healthcheck:                                     
+        test: ["CMD-SHELL", "pg_isready -U postgres"]  
+        interval: 10s                                  
+        timeout: 5s                                    
+        retries: 5                                     
+      networks:                                        
+        - steelenergy_network  
   
   pgadmin:
     image: dpage/pgadmin4
@@ -81,6 +83,30 @@ services:
       - timescaledb
     networks:
       - steelenergy_network
+
+  spark:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    container_name: spark_worker
+    ports:
+      - "8888:8888"
+      - "4041:4040"
+    volumes:
+      - .:/home/jovyan/work
+    command: >
+      start-notebook.py
+      --ServerApp.root_dir='/home/jovyan/work'
+      --ServerApp.token=''
+      --ServerApp.password=''
+      --ServerApp.allow_origin='*'
+      --ip=0.0.0.0
+    depends_on:
+      - kafka
+      - timescaledb
+    networks:
+      - steelenergy_network
+
 networks:
   steelenergy_network:
     name: steelenergy_network
@@ -88,4 +114,5 @@ networks:
 
 volumes:                           
   timescale_data:       
-  grafana_data:           
+  grafana_data:
+  kafka_data:

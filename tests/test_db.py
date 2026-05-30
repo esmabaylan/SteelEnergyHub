@@ -1,57 +1,104 @@
 import pytest
 import psycopg2
 
+DB_CONFIG = {
+    "host": "timescaledb",
+    "port": 5432,
+    "database": "energydb",
+    "user": "data_writer",
+    "password": "sifre123",
+    "options": "-c search_path=main_data"
+}
+
+TABLES = [
+    "main_data.energy_readings",
+    "main_data.processed_readings",
+    "main_data.anomalies",
+    "main_data.cost_analysis"
+]
+
+
 @pytest.fixture
-def db_connection():
-    conn = psycopg2.connect(
-        dbname="energydb",
-        user="postgres",
-        password="postgres",
-        host="host.docker.internal", 
-        port="5435"
-    )
-    
+def conn():
+    connection = psycopg2.connect(**DB_CONFIG)
+    yield connection
+    connection.close()
 
-    cursor = conn.cursor()
-    cursor.execute("DROP TABLE IF EXISTS energy_metrics;")
-    cursor.execute("""
-        CREATE TABLE energy_metrics (
-            id SERIAL PRIMARY KEY, 
-            metric_name VARCHAR(50), 
-            metric_value FLOAT
-        );
+
+def test_connection(conn):
+    """Veritabanı bağlantısı kurulabiliyor mu?"""
+    assert conn is not None
+
+
+def test_tables_exist(conn):
+    """Tüm tablolar mevcut mu?"""
+    cur = conn.cursor()
+    for table in TABLES:
+        schema, name = table.split(".")
+        cur.execute("""
+            SELECT EXISTS (
+                SELECT FROM information_schema.tables
+                WHERE table_schema = %s AND table_name = %s
+            );
+        """, (schema, name))
+        exists = cur.fetchone()[0]
+        assert exists, f"Tablo bulunamadı: {table}"
+    cur.close()
+
+
+def test_energy_readings_has_data(conn):
+    """energy_readings tablosunda veri var mı?"""
+    cur = conn.cursor()
+    cur.execute("SELECT COUNT(*) FROM main_data.energy_readings;")
+    count = cur.fetchone()[0]
+    assert count > 0, "energy_readings tablosu boş!"
+    print(f"  energy_readings satır sayısı: {count}")
+    cur.close()
+
+
+def test_processed_readings_has_data(conn):
+    """processed_readings tablosunda veri var mı?"""
+    cur = conn.cursor()
+    cur.execute("SELECT COUNT(*) FROM main_data.processed_readings;")
+    count = cur.fetchone()[0]
+    assert count > 0, "processed_readings tablosu boş!"
+    print(f"  processed_readings satır sayısı: {count}")
+    cur.close()
+
+
+def test_anomalies_has_data(conn):
+    """anomalies tablosunda veri var mı?"""
+    cur = conn.cursor()
+    cur.execute("SELECT COUNT(*) FROM main_data.anomalies;")
+    count = cur.fetchone()[0]
+    assert count > 0, "anomalies tablosu boş!"
+    print(f"  anomalies satır sayısı: {count}")
+    cur.close()
+
+
+def test_roles_exist(conn):
+    """data_writer ve report_reader rolleri var mı?"""
+    cur = conn.cursor()
+    for role in ["data_writer", "report_reader"]:
+        cur.execute("""
+            SELECT EXISTS (
+                SELECT FROM pg_catalog.pg_roles WHERE rolname = %s
+            );
+        """, (role,))
+        exists = cur.fetchone()[0]
+        assert exists, f"Rol bulunamadı: {role}"
+    cur.close()
+
+
+def test_hypertables(conn):
+    """Tablolar hypertable olarak tanımlı mı?"""
+    cur = conn.cursor()
+    cur.execute("""
+        SELECT hypertable_name
+        FROM timescaledb_information.hypertables
+        WHERE hypertable_schema = 'main_data';
     """)
-    conn.commit()
-
-    # 2. MENTÖRLÜK: yield, bağlantıyı teste verir, test bitince alt satırdan çalışmaya devam eder.
-    yield conn  
-
-    # Temizlik (Teardown): Test bittikten sonra bağlantıyı kapatıyoruz.
-    conn.close()
-
-
-# 3. MENTÖRLÜK: Test fonksiyonları 'test_' ile başlar ve bağımsız (izole) olmalıdır.
-def test_db_insertion_and_query(db_connection):
-    """Veri ekleme ve o veriyi çekme işlemini test eder."""
-    
-    # db_connection fixture'ı otomatik olarak bu teste parametre olarak geldi.
-    cursor = db_connection.cursor()
-
-    # Eylem (Act): Veritabanına test verisi ekle
-    test_metric_name = "cpu_usage"
-    test_metric_value = 85.5
-    cursor.execute(
-        "INSERT INTO energy_metrics (metric_name, metric_value) VALUES (%s, %s);", 
-        (test_metric_name, test_metric_value)
-    )
-    db_connection.commit()
-
-    # Eylem (Act): Eklenen veriyi geri çek
-    cursor.execute("SELECT metric_name, metric_value FROM energy_metrics WHERE metric_name = %s;", (test_metric_name,))
-    result = cursor.fetchone()
-
-    # 4. MENTÖRLÜK: Assert kullanımı. Pytest'in kalbi burasıdır.
-    # Burada try-except kullanmıyoruz. Eğer veri dönmezse assert None'da patlar ve hatayı görürüz.
-    assert result is not None, "Veritabanından sorgulanan kayıt dönmedi!"
-    assert result[0] == test_metric_name, f"Beklenen metrik ismi '{test_metric_name}', ancak '{result[0]}' geldi."
-    assert result[1] == test_metric_value, "Veritabanına yazılan sayısal değer bozulmuş veya yanlış gelmiş."
+    hypertables = [row[0] for row in cur.fetchall()]
+    for table in ["energy_readings", "processed_readings", "anomalies", "cost_analysis"]:
+        assert table in hypertables, f"{table} hypertable değil!"
+    cur.close()
