@@ -4,7 +4,7 @@ from confluent_kafka import Producer, Consumer, KafkaError
 from datetime import datetime
 
 KAFKA_CONFIG = {"bootstrap.servers": "kafka:9092"}
-TOPIC = "energy_topic"
+TOPIC = "energy_raw"
 
 
 def test_kafka_connection():
@@ -17,7 +17,7 @@ def test_kafka_connection():
 
 
 def test_topic_exists():
-    """energy_topic topic'i mevcut mu?"""
+    """energy_raw topic'i mevcut mu?"""
     from confluent_kafka.admin import AdminClient
     admin = AdminClient(KAFKA_CONFIG)
     topics = admin.list_topics(timeout=5).topics
