@@ -1,0 +1,967 @@
+﻿{
+    "annotations":  {
+                        "list":  [
+                                     {
+                                         "builtIn":  1,
+                                         "datasource":  {
+                                                            "type":  "grafana",
+                                                            "uid":  "-- Grafana --"
+                                                        },
+                                         "enable":  true,
+                                         "hide":  true,
+                                         "iconColor":  "rgba(0, 211, 255, 1)",
+                                         "name":  "Annotations \u0026 Alerts",
+                                         "type":  "dashboard"
+                                     }
+                                 ]
+                    },
+    "editable":  true,
+    "fiscalYearStartMonth":  0,
+    "graphTooltip":  0,
+    "id":  2657603282554880,
+    "liveNow":  false,
+    "panels":  [
+                   {
+                       "datasource":  {
+                                          "type":  "grafana-postgresql-datasource",
+                                          "uid":  "afnnbaf3dik8we"
+                                      },
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "color":  {
+                                                                          "mode":  "palette-classic"
+                                                                      },
+                                                            "custom":  {
+                                                                           "axisBorderShow":  false,
+                                                                           "axisCenteredZero":  false,
+                                                                           "axisColorMode":  "text",
+                                                                           "axisLabel":  "",
+                                                                           "axisPlacement":  "auto",
+                                                                           "barAlignment":  0,
+                                                                           "barWidthFactor":  0.6,
+                                                                           "drawStyle":  "line",
+                                                                           "fillOpacity":  0,
+                                                                           "gradientMode":  "none",
+                                                                           "hideFrom":  {
+                                                                                            "legend":  false,
+                                                                                            "tooltip":  false,
+                                                                                            "viz":  false
+                                                                                        },
+                                                                           "insertNulls":  false,
+                                                                           "lineInterpolation":  "linear",
+                                                                           "lineWidth":  1,
+                                                                           "pointSize":  5,
+                                                                           "scaleDistribution":  {
+                                                                                                     "type":  "linear"
+                                                                                                 },
+                                                                           "showPoints":  "auto",
+                                                                           "showValues":  false,
+                                                                           "spanNulls":  false,
+                                                                           "stacking":  {
+                                                                                            "group":  "A",
+                                                                                            "mode":  "none"
+                                                                                        },
+                                                                           "thresholdsStyle":  {
+                                                                                                   "mode":  "line"
+                                                                                               }
+                                                                       },
+                                                            "thresholds":  {
+                                                                               "mode":  "absolute",
+                                                                               "steps":  [
+                                                                                             {
+                                                                                                 "color":  "green",
+                                                                                                 "value":  0
+                                                                                             },
+                                                                                             {
+                                                                                                 "color":  "red",
+                                                                                                 "value":  80
+                                                                                             }
+                                                                                         ]
+                                                                           },
+                                                            "unit":  "percent"
+                                                        }
+                                       },
+                       "gridPos":  {
+                                       "h":  7,
+                                       "w":  14,
+                                       "x":  0,
+                                       "y":  0
+                                   },
+                       "id":  7,
+                       "options":  {
+                                       "annotations":  {
+                                                           "clustering":  -1,
+                                                           "multiLane":  false
+                                                       },
+                                       "legend":  {
+                                                      "calcs":  [
+
+                                                                ],
+                                                      "displayMode":  "list",
+                                                      "placement":  "bottom",
+                                                      "showLegend":  true
+                                                  },
+                                       "tooltip":  {
+                                                       "hideZeros":  false,
+                                                       "mode":  "single",
+                                                       "sort":  "none"
+                                                   }
+                                   },
+                       "pluginVersion":  "13.0.1+security-01",
+                       "targets":  [
+                                       {
+                                           "dataset":  "energydb",
+                                           "datasource":  {
+                                                              "type":  "grafana-postgresql-datasource",
+                                                              "uid":  "afnnbaf3dik8we"
+                                                          },
+                                           "editorMode":  "code",
+                                           "format":  "table",
+                                           "rawQuery":  true,
+                                           "rawSql":  "SELECT\r\n  time AS \"time\",\r\n  ROUND(pf_efficiency::numeric, 2) as guc_faktoru,\r\n  ROUND(lagging_pf::numeric, 2) as gec_pf\r\nFROM main_data.processed_readings\r\nWHERE $__timeFilter(time)\r\n  AND shift IN (${shift:sqlstring})\r\nORDER BY time",
+                                           "refId":  "A",
+                                           "sql":  {
+                                                       "columns":  [
+                                                                       {
+                                                                           "parameters":  [
+
+                                                                                          ],
+                                                                           "type":  "function"
+                                                                       }
+                                                                   ],
+                                                       "groupBy":  [
+                                                                       {
+                                                                           "property":  {
+                                                                                            "type":  "string"
+                                                                                        },
+                                                                           "type":  "groupBy"
+                                                                       }
+                                                                   ],
+                                                       "limit":  50
+                                                   }
+                                       }
+                                   ],
+                       "title":  "GÃ¼Ã§ FaktÃ¶rÃ¼ VerimliliÄi",
+                       "type":  "timeseries"
+                   },
+                   {
+                       "datasource":  {
+                                          "type":  "grafana-postgresql-datasource",
+                                          "uid":  "afnnbaf3dik8we"
+                                      },
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "color":  {
+                                                                          "mode":  "continuous-GrYlRd"
+                                                                      },
+                                                            "thresholds":  {
+                                                                               "mode":  "absolute",
+                                                                               "steps":  [
+                                                                                             {
+                                                                                                 "color":  "green",
+                                                                                                 "value":  0
+                                                                                             },
+                                                                                             {
+                                                                                                 "color":  "red",
+                                                                                                 "value":  80
+                                                                                             }
+                                                                                         ]
+                                                                           },
+                                                            "unit":  "kwatth"
+                                                        }
+                                       },
+                       "gridPos":  {
+                                       "h":  13,
+                                       "w":  10,
+                                       "x":  14,
+                                       "y":  0
+                                   },
+                       "id":  5,
+                       "options":  {
+                                       "displayMode":  "lcd",
+                                       "legend":  {
+                                                      "calcs":  [
+
+                                                                ],
+                                                      "displayMode":  "list",
+                                                      "placement":  "bottom",
+                                                      "showLegend":  false
+                                                  },
+                                       "maxVizHeight":  300,
+                                       "minVizHeight":  16,
+                                       "minVizWidth":  8,
+                                       "namePlacement":  "auto",
+                                       "orientation":  "auto",
+                                       "reduceOptions":  {
+                                                             "calcs":  [
+
+                                                                       ],
+                                                             "fields":  "",
+                                                             "values":  true
+                                                         },
+                                       "showUnfilled":  true,
+                                       "sizing":  "auto",
+                                       "valueMode":  "color"
+                                   },
+                       "pluginVersion":  "13.0.1+security-01",
+                       "targets":  [
+                                       {
+                                           "dataset":  "energydb",
+                                           "datasource":  {
+                                                              "type":  "grafana-postgresql-datasource",
+                                                              "uid":  "afnnbaf3dik8we"
+                                                          },
+                                           "editorMode":  "code",
+                                           "format":  "table",
+                                           "rawQuery":  true,
+                                           "rawSql":  "SELECT\r\n  hour::text as saat,\r\n  ROUND(AVG(usage_kwh)::numeric, 2) as ort_tuketim\r\nFROM main_data.processed_readings\r\nWHERE $__timeFilter(time)\r\nGROUP BY hour\r\nORDER BY hour",
+                                           "refId":  "A",
+                                           "sql":  {
+                                                       "columns":  [
+                                                                       {
+                                                                           "parameters":  [
+
+                                                                                          ],
+                                                                           "type":  "function"
+                                                                       }
+                                                                   ],
+                                                       "groupBy":  [
+                                                                       {
+                                                                           "property":  {
+                                                                                            "type":  "string"
+                                                                                        },
+                                                                           "type":  "groupBy"
+                                                                       }
+                                                                   ],
+                                                       "limit":  50
+                                                   }
+                                       }
+                                   ],
+                       "title":  "Saatlik Ortalama TÃ¼ketim",
+                       "type":  "bargauge"
+                   },
+                   {
+                       "datasource":  {
+                                          "type":  "grafana-postgresql-datasource",
+                                          "uid":  "afnnbaf3dik8we"
+                                      },
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "color":  {
+                                                                          "mode":  "palette-classic"
+                                                                      },
+                                                            "custom":  {
+                                                                           "axisBorderShow":  false,
+                                                                           "axisCenteredZero":  false,
+                                                                           "axisColorMode":  "text",
+                                                                           "axisLabel":  "",
+                                                                           "axisPlacement":  "auto",
+                                                                           "barAlignment":  0,
+                                                                           "barWidthFactor":  0.6,
+                                                                           "drawStyle":  "line",
+                                                                           "fillOpacity":  0,
+                                                                           "gradientMode":  "none",
+                                                                           "hideFrom":  {
+                                                                                            "legend":  false,
+                                                                                            "tooltip":  false,
+                                                                                            "viz":  false
+                                                                                        },
+                                                                           "insertNulls":  false,
+                                                                           "lineInterpolation":  "linear",
+                                                                           "lineWidth":  1,
+                                                                           "pointSize":  5,
+                                                                           "scaleDistribution":  {
+                                                                                                     "type":  "linear"
+                                                                                                 },
+                                                                           "showPoints":  "auto",
+                                                                           "showValues":  false,
+                                                                           "spanNulls":  false,
+                                                                           "stacking":  {
+                                                                                            "group":  "A",
+                                                                                            "mode":  "none"
+                                                                                        },
+                                                                           "thresholdsStyle":  {
+                                                                                                   "mode":  "off"
+                                                                                               }
+                                                                       },
+                                                            "thresholds":  {
+                                                                               "mode":  "absolute",
+                                                                               "steps":  [
+                                                                                             {
+                                                                                                 "color":  "green",
+                                                                                                 "value":  0
+                                                                                             },
+                                                                                             {
+                                                                                                 "color":  "red",
+                                                                                                 "value":  80
+                                                                                             }
+                                                                                         ]
+                                                                           },
+                                                            "unit":  "kwatth"
+                                                        }
+                                       },
+                       "gridPos":  {
+                                       "h":  6,
+                                       "w":  14,
+                                       "x":  0,
+                                       "y":  7
+                                   },
+                       "id":  8,
+                       "options":  {
+                                       "annotations":  {
+                                                           "clustering":  -1,
+                                                           "multiLane":  false
+                                                       },
+                                       "legend":  {
+                                                      "calcs":  [
+
+                                                                ],
+                                                      "displayMode":  "list",
+                                                      "placement":  "bottom",
+                                                      "showLegend":  true
+                                                  },
+                                       "tooltip":  {
+                                                       "hideZeros":  false,
+                                                       "mode":  "single",
+                                                       "sort":  "none"
+                                                   }
+                                   },
+                       "pluginVersion":  "13.0.1+security-01",
+                       "targets":  [
+                                       {
+                                           "dataset":  "energydb",
+                                           "datasource":  {
+                                                              "type":  "grafana-postgresql-datasource",
+                                                              "uid":  "afnnbaf3dik8we"
+                                                          },
+                                           "editorMode":  "code",
+                                           "format":  "table",
+                                           "rawQuery":  true,
+                                           "rawSql":  "SELECT\r\n  time AS \"time\",\r\n  ROUND(usage_ma_1h::numeric, 2) as \"1 Saatlik MA\",\r\n  ROUND(usage_ma_4h::numeric, 2) as \"4 Saatlik MA\"\r\nFROM main_data.processed_readings\r\nWHERE $__timeFilter(time)\r\n  AND shift IN (${shift:sqlstring})\r\nORDER BY time",
+                                           "refId":  "A",
+                                           "sql":  {
+                                                       "columns":  [
+                                                                       {
+                                                                           "parameters":  [
+
+                                                                                          ],
+                                                                           "type":  "function"
+                                                                       }
+                                                                   ],
+                                                       "groupBy":  [
+                                                                       {
+                                                                           "property":  {
+                                                                                            "type":  "string"
+                                                                                        },
+                                                                           "type":  "groupBy"
+                                                                       }
+                                                                   ],
+                                                       "limit":  50
+                                                   }
+                                       }
+                                   ],
+                       "title":  "Hareketli Ortalama TÃ¼ketim (kWh)",
+                       "type":  "timeseries"
+                   },
+                   {
+                       "datasource":  {
+                                          "type":  "grafana-postgresql-datasource",
+                                          "uid":  "afnnbaf3dik8we"
+                                      },
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "color":  {
+                                                                          "mode":  "palette-classic"
+                                                                      },
+                                                            "custom":  {
+                                                                           "axisBorderShow":  false,
+                                                                           "axisCenteredZero":  false,
+                                                                           "axisColorMode":  "text",
+                                                                           "axisLabel":  "",
+                                                                           "axisPlacement":  "auto",
+                                                                           "fillOpacity":  80,
+                                                                           "gradientMode":  "none",
+                                                                           "hideFrom":  {
+                                                                                            "legend":  false,
+                                                                                            "tooltip":  false,
+                                                                                            "viz":  false
+                                                                                        },
+                                                                           "lineWidth":  1,
+                                                                           "scaleDistribution":  {
+                                                                                                     "type":  "linear"
+                                                                                                 },
+                                                                           "thresholdsStyle":  {
+                                                                                                   "mode":  "off"
+                                                                                               }
+                                                                       },
+                                                            "thresholds":  {
+                                                                               "mode":  "absolute",
+                                                                               "steps":  [
+                                                                                             {
+                                                                                                 "color":  "green",
+                                                                                                 "value":  0
+                                                                                             },
+                                                                                             {
+                                                                                                 "color":  "red",
+                                                                                                 "value":  80
+                                                                                             }
+                                                                                         ]
+                                                                           },
+                                                            "unit":  "kwatth"
+                                                        }
+                                       },
+                       "gridPos":  {
+                                       "h":  9,
+                                       "w":  8,
+                                       "x":  0,
+                                       "y":  13
+                                   },
+                       "id":  6,
+                       "options":  {
+                                       "barRadius":  0,
+                                       "barWidth":  0.97,
+                                       "fullHighlight":  false,
+                                       "groupWidth":  0.7,
+                                       "legend":  {
+                                                      "calcs":  [
+
+                                                                ],
+                                                      "displayMode":  "list",
+                                                      "placement":  "right",
+                                                      "showLegend":  true
+                                                  },
+                                       "orientation":  "horizontal",
+                                       "showValue":  "never",
+                                       "stacking":  "none",
+                                       "tooltip":  {
+                                                       "hideZeros":  false,
+                                                       "mode":  "single",
+                                                       "sort":  "none"
+                                                   },
+                                       "xTickLabelRotation":  0,
+                                       "xTickLabelSpacing":  0
+                                   },
+                       "pluginVersion":  "13.0.1+security-01",
+                       "targets":  [
+                                       {
+                                           "dataset":  "energydb",
+                                           "datasource":  {
+                                                              "type":  "grafana-postgresql-datasource",
+                                                              "uid":  "afnnbaf3dik8we"
+                                                          },
+                                           "editorMode":  "code",
+                                           "format":  "table",
+                                           "rawQuery":  true,
+                                           "rawSql":  "SELECT\r\n  shift as vardiya,\r\n  ROUND(AVG(usage_kwh)::numeric, 2) as ort_tuketim\r\nFROM main_data.processed_readings\r\nWHERE $__timeFilter(time)\r\nGROUP BY shift\r\nORDER BY ort_tuketim DESC",
+                                           "refId":  "A",
+                                           "sql":  {
+                                                       "columns":  [
+                                                                       {
+                                                                           "parameters":  [
+
+                                                                                          ],
+                                                                           "type":  "function"
+                                                                       }
+                                                                   ],
+                                                       "groupBy":  [
+                                                                       {
+                                                                           "property":  {
+                                                                                            "type":  "string"
+                                                                                        },
+                                                                           "type":  "groupBy"
+                                                                       }
+                                                                   ],
+                                                       "limit":  50
+                                                   }
+                                       }
+                                   ],
+                       "title":  "Vardiyaya gÃ¶re ortalama tÃ¼ketim",
+                       "type":  "barchart"
+                   },
+                   {
+                       "datasource":  {
+                                          "type":  "grafana-postgresql-datasource",
+                                          "uid":  "afnnbaf3dik8we"
+                                      },
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "thresholds":  {
+                                                                               "mode":  "absolute",
+                                                                               "steps":  [
+                                                                                             {
+                                                                                                 "color":  "green",
+                                                                                                 "value":  0
+                                                                                             },
+                                                                                             {
+                                                                                                 "color":  "red",
+                                                                                                 "value":  80
+                                                                                             }
+                                                                                         ]
+                                                                           },
+                                                            "unit":  "kwatth"
+                                                        }
+                                       },
+                       "gridPos":  {
+                                       "h":  9,
+                                       "w":  4,
+                                       "x":  8,
+                                       "y":  13
+                                   },
+                       "id":  1,
+                       "options":  {
+                                       "barShape":  "flat",
+                                       "barWidthFactor":  0.3,
+                                       "effects":  {
+                                                       "barGlow":  false,
+                                                       "centerGlow":  false,
+                                                       "gradient":  true
+                                                   },
+                                       "endpointMarker":  "point",
+                                       "minVizHeight":  75,
+                                       "minVizWidth":  75,
+                                       "orientation":  "auto",
+                                       "reduceOptions":  {
+                                                             "calcs":  [
+                                                                           "lastNotNull"
+                                                                       ],
+                                                             "fields":  "",
+                                                             "values":  false
+                                                         },
+                                       "segmentCount":  1,
+                                       "segmentSpacing":  0.3,
+                                       "shape":  "gauge",
+                                       "showThresholdLabels":  false,
+                                       "showThresholdMarkers":  false,
+                                       "sizing":  "auto",
+                                       "sparkline":  false,
+                                       "textMode":  "auto"
+                                   },
+                       "pluginVersion":  "13.0.1+security-01",
+                       "targets":  [
+                                       {
+                                           "dataset":  "energydb",
+                                           "datasource":  {
+                                                              "type":  "grafana-postgresql-datasource",
+                                                              "uid":  "afnnbaf3dik8we"
+                                                          },
+                                           "editorMode":  "code",
+                                           "format":  "table",
+                                           "rawQuery":  true,
+                                           "rawSql":  "SELECT ROUND(AVG(usage_kwh)::numeric, 2) as ort_tuketim\r\nFROM main_data.processed_readings\r\nWHERE $__timeFilter(time)\r\n  AND shift IN (${shift:sqlstring})",
+                                           "refId":  "A",
+                                           "sql":  {
+                                                       "columns":  [
+                                                                       {
+                                                                           "parameters":  [
+
+                                                                                          ],
+                                                                           "type":  "function"
+                                                                       }
+                                                                   ],
+                                                       "groupBy":  [
+                                                                       {
+                                                                           "property":  {
+                                                                                            "type":  "string"
+                                                                                        },
+                                                                           "type":  "groupBy"
+                                                                       }
+                                                                   ],
+                                                       "limit":  50
+                                                   }
+                                       }
+                                   ],
+                       "title":  "Ortalama TÃ¼ketim (kWh)",
+                       "type":  "gauge"
+                   },
+                   {
+                       "datasource":  {
+                                          "type":  "grafana-postgresql-datasource",
+                                          "uid":  "afnnbaf3dik8we"
+                                      },
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "thresholds":  {
+                                                                               "mode":  "absolute",
+                                                                               "steps":  [
+                                                                                             {
+                                                                                                 "color":  "green",
+                                                                                                 "value":  0
+                                                                                             },
+                                                                                             {
+                                                                                                 "color":  "red",
+                                                                                                 "value":  0
+                                                                                             },
+                                                                                             {
+                                                                                                 "color":  "#EAB839",
+                                                                                                 "value":  80
+                                                                                             },
+                                                                                             {
+                                                                                                 "color":  "dark-green",
+                                                                                                 "value":  90
+                                                                                             }
+                                                                                         ]
+                                                                           },
+                                                            "unit":  "percent"
+                                                        }
+                                       },
+                       "gridPos":  {
+                                       "h":  9,
+                                       "w":  4,
+                                       "x":  12,
+                                       "y":  13
+                                   },
+                       "id":  3,
+                       "options":  {
+                                       "barShape":  "flat",
+                                       "barWidthFactor":  0.3,
+                                       "effects":  {
+                                                       "barGlow":  false,
+                                                       "centerGlow":  false,
+                                                       "gradient":  true
+                                                   },
+                                       "endpointMarker":  "point",
+                                       "minVizHeight":  75,
+                                       "minVizWidth":  75,
+                                       "orientation":  "auto",
+                                       "reduceOptions":  {
+                                                             "calcs":  [
+                                                                           "lastNotNull"
+                                                                       ],
+                                                             "fields":  "",
+                                                             "values":  false
+                                                         },
+                                       "segmentCount":  1,
+                                       "segmentSpacing":  0.3,
+                                       "shape":  "gauge",
+                                       "showThresholdLabels":  false,
+                                       "showThresholdMarkers":  false,
+                                       "sizing":  "auto",
+                                       "sparkline":  false,
+                                       "textMode":  "auto"
+                                   },
+                       "pluginVersion":  "13.0.1+security-01",
+                       "targets":  [
+                                       {
+                                           "dataset":  "energydb",
+                                           "datasource":  {
+                                                              "type":  "grafana-postgresql-datasource",
+                                                              "uid":  "afnnbaf3dik8we"
+                                                          },
+                                           "editorMode":  "code",
+                                           "format":  "table",
+                                           "rawQuery":  true,
+                                           "rawSql":  "SELECT ROUND(AVG(pf_efficiency)::numeric, 1) as pf_ort\r\nFROM main_data.processed_readings\r\nWHERE $__timeFilter(time)\r\n  AND shift IN (${shift:sqlstring})",
+                                           "refId":  "A",
+                                           "sql":  {
+                                                       "columns":  [
+                                                                       {
+                                                                           "parameters":  [
+
+                                                                                          ],
+                                                                           "type":  "function"
+                                                                       }
+                                                                   ],
+                                                       "groupBy":  [
+                                                                       {
+                                                                           "property":  {
+                                                                                            "type":  "string"
+                                                                                        },
+                                                                           "type":  "groupBy"
+                                                                       }
+                                                                   ],
+                                                       "limit":  50
+                                                   }
+                                       }
+                                   ],
+                       "title":  "GÃ¼Ã§ FaktÃ¶rÃ¼ OrtalamasÄ±",
+                       "type":  "gauge"
+                   },
+                   {
+                       "datasource":  {
+                                          "type":  "grafana-postgresql-datasource",
+                                          "uid":  "afnnbaf3dik8we"
+                                      },
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "thresholds":  {
+                                                                               "mode":  "absolute",
+                                                                               "steps":  [
+                                                                                             {
+                                                                                                 "color":  "green",
+                                                                                                 "value":  0
+                                                                                             },
+                                                                                             {
+                                                                                                 "color":  "green",
+                                                                                                 "value":  0
+                                                                                             },
+                                                                                             {
+                                                                                                 "color":  "#EAB839",
+                                                                                                 "value":  80
+                                                                                             },
+                                                                                             {
+                                                                                                 "color":  "red",
+                                                                                                 "value":  120
+                                                                                             }
+                                                                                         ]
+                                                                           },
+                                                            "unit":  "kwatth"
+                                                        }
+                                       },
+                       "gridPos":  {
+                                       "h":  9,
+                                       "w":  4,
+                                       "x":  16,
+                                       "y":  13
+                                   },
+                       "id":  2,
+                       "options":  {
+                                       "barShape":  "flat",
+                                       "barWidthFactor":  0.3,
+                                       "effects":  {
+                                                       "barGlow":  false,
+                                                       "centerGlow":  false,
+                                                       "gradient":  true
+                                                   },
+                                       "endpointMarker":  "point",
+                                       "minVizHeight":  75,
+                                       "minVizWidth":  75,
+                                       "orientation":  "auto",
+                                       "reduceOptions":  {
+                                                             "calcs":  [
+                                                                           "lastNotNull"
+                                                                       ],
+                                                             "fields":  "",
+                                                             "values":  false
+                                                         },
+                                       "segmentCount":  1,
+                                       "segmentSpacing":  0.3,
+                                       "shape":  "gauge",
+                                       "showThresholdLabels":  false,
+                                       "showThresholdMarkers":  false,
+                                       "sizing":  "auto",
+                                       "sparkline":  false,
+                                       "textMode":  "auto"
+                                   },
+                       "pluginVersion":  "13.0.1+security-01",
+                       "targets":  [
+                                       {
+                                           "dataset":  "energydb",
+                                           "datasource":  {
+                                                              "type":  "grafana-postgresql-datasource",
+                                                              "uid":  "afnnbaf3dik8we"
+                                                          },
+                                           "editorMode":  "code",
+                                           "format":  "table",
+                                           "rawQuery":  true,
+                                           "rawSql":  "SELECT ROUND(MAX(usage_kwh)::numeric, 2) as pik_tuketim\r\nFROM main_data.processed_readings\r\nWHERE $__timeFilter(time)\r\n  AND shift IN (${shift:sqlstring})",
+                                           "refId":  "A",
+                                           "sql":  {
+                                                       "columns":  [
+                                                                       {
+                                                                           "parameters":  [
+
+                                                                                          ],
+                                                                           "type":  "function"
+                                                                       }
+                                                                   ],
+                                                       "groupBy":  [
+                                                                       {
+                                                                           "property":  {
+                                                                                            "type":  "string"
+                                                                                        },
+                                                                           "type":  "groupBy"
+                                                                       }
+                                                                   ],
+                                                       "limit":  50
+                                                   }
+                                       }
+                                   ],
+                       "title":  "Pik TÃ¼ketim (kWh)",
+                       "type":  "gauge"
+                   },
+                   {
+                       "datasource":  {
+                                          "type":  "grafana-postgresql-datasource",
+                                          "uid":  "afnnbaf3dik8we"
+                                      },
+                       "fieldConfig":  {
+                                           "defaults":  {
+                                                            "thresholds":  {
+                                                                               "mode":  "absolute",
+                                                                               "steps":  [
+                                                                                             {
+                                                                                                 "color":  "green",
+                                                                                                 "value":  0
+                                                                                             },
+                                                                                             {
+                                                                                                 "color":  "dark-green",
+                                                                                                 "value":  0
+                                                                                             },
+                                                                                             {
+                                                                                                 "color":  "#EAB839",
+                                                                                                 "value":  20
+                                                                                             },
+                                                                                             {
+                                                                                                 "color":  "red",
+                                                                                                 "value":  40
+                                                                                             }
+                                                                                         ]
+                                                                           },
+                                                            "unit":  "percent"
+                                                        }
+                                       },
+                       "gridPos":  {
+                                       "h":  9,
+                                       "w":  4,
+                                       "x":  20,
+                                       "y":  13
+                                   },
+                       "id":  4,
+                       "options":  {
+                                       "barShape":  "flat",
+                                       "barWidthFactor":  0.3,
+                                       "effects":  {
+                                                       "barGlow":  false,
+                                                       "centerGlow":  false,
+                                                       "gradient":  true
+                                                   },
+                                       "endpointMarker":  "point",
+                                       "minVizHeight":  75,
+                                       "minVizWidth":  75,
+                                       "orientation":  "auto",
+                                       "reduceOptions":  {
+                                                             "calcs":  [
+                                                                           "lastNotNull"
+                                                                       ],
+                                                             "fields":  "",
+                                                             "values":  false
+                                                         },
+                                       "segmentCount":  1,
+                                       "segmentSpacing":  0.3,
+                                       "shape":  "gauge",
+                                       "showThresholdLabels":  false,
+                                       "showThresholdMarkers":  false,
+                                       "sizing":  "auto",
+                                       "sparkline":  false,
+                                       "textMode":  "auto"
+                                   },
+                       "pluginVersion":  "13.0.1+security-01",
+                       "targets":  [
+                                       {
+                                           "dataset":  "energydb",
+                                           "datasource":  {
+                                                              "type":  "grafana-postgresql-datasource",
+                                                              "uid":  "afnnbaf3dik8we"
+                                                          },
+                                           "editorMode":  "code",
+                                           "format":  "table",
+                                           "rawQuery":  true,
+                                           "rawSql":  "SELECT ROUND(\r\n  AVG(CASE WHEN low_pf_flag THEN 1.0 ELSE 0 END) * 100\r\n  ::numeric, 1) as dusuk_pf_orani\r\nFROM main_data.processed_readings\r\nWHERE $__timeFilter(time)",
+                                           "refId":  "A",
+                                           "sql":  {
+                                                       "columns":  [
+                                                                       {
+                                                                           "parameters":  [
+
+                                                                                          ],
+                                                                           "type":  "function"
+                                                                       }
+                                                                   ],
+                                                       "groupBy":  [
+                                                                       {
+                                                                           "property":  {
+                                                                                            "type":  "string"
+                                                                                        },
+                                                                           "type":  "groupBy"
+                                                                       }
+                                                                   ],
+                                                       "limit":  50
+                                                   }
+                                       }
+                                   ],
+                       "title":  "DÃ¼ÅÃ¼k GÃ¼Ã§ OranÄ± (%)",
+                       "type":  "gauge"
+                   }
+               ],
+    "preload":  false,
+    "refresh":  "",
+    "schemaVersion":  42,
+    "templating":  {
+                       "list":  [
+                                    {
+                                        "allowCustomValue":  true,
+                                        "current":  {
+                                                        "text":  [
+                                                                     "night_shift",
+                                                                     "day_shift",
+                                                                     "evening_shift"
+                                                                 ],
+                                                        "value":  [
+                                                                      "night_shift",
+                                                                      "day_shift",
+                                                                      "evening_shift"
+                                                                  ]
+                                                    },
+                                        "hide":  0,
+                                        "includeAll":  true,
+                                        "label":  "Vardiya",
+                                        "multi":  true,
+                                        "name":  "shift",
+                                        "options":  [
+
+                                                    ],
+                                        "query":  "night_shift,day_shift,evening_shift",
+                                        "skipUrlSync":  false,
+                                        "type":  "custom",
+                                        "valuesFormat":  "csv"
+                                    },
+                                    {
+                                        "allowCustomValue":  true,
+                                        "current":  {
+                                                        "text":  [
+                                                                     "night",
+                                                                     "day"
+                                                                 ],
+                                                        "value":  [
+                                                                      "night",
+                                                                      "day"
+                                                                  ]
+                                                    },
+                                        "hide":  0,
+                                        "includeAll":  true,
+                                        "label":  "Tarife",
+                                        "multi":  true,
+                                        "name":  "tariff",
+                                        "options":  [
+
+                                                    ],
+                                        "query":  "night,day",
+                                        "skipUrlSync":  false,
+                                        "type":  "custom",
+                                        "valuesFormat":  "csv"
+                                    }
+                                ]
+                   },
+    "time":  {
+                 "from":  "now/d",
+                 "to":  "now/d"
+             },
+    "timepicker":  {
+                       "refresh_intervals":  [
+                                                 "5s",
+                                                 "10s",
+                                                 "30s",
+                                                 "1m",
+                                                 "5m",
+                                                 "15m",
+                                                 "30m",
+                                                 "1h",
+                                                 "2h",
+                                                 "1d"
+                                             ]
+                   },
+    "timezone":  "browser",
+    "title":  "Enerji Analizleri",
+    "uid":  "ad6plwp",
+    "version":  9
+}

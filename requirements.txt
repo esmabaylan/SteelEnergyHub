@@ -5,5 +5,4 @@ sqlalchemy
 kafka-python
 matplotlib
 pytest
-flask
 confluent-kafka

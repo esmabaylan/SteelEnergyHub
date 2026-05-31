@@ -1,11 +1,11 @@
 # run_system.ps1
 
 Write-Host "========================================" -ForegroundColor Cyan
-Write-Host "  Steel Energy Hub - Sistem Başlatılıyor" -ForegroundColor Cyan
+Write-Host "  Steel Energy Hub - Sistem baslatiliyor" -ForegroundColor Cyan
 Write-Host "========================================" -ForegroundColor Cyan
 
-# 1. Docker servisleri başlat
-Write-Host "`n[1/7] Docker servisleri başlatılıyor..." -ForegroundColor Yellow
+# 1. Docker servisleri baslat
+Write-Host "`n[1/7] Docker servisleri baslatiliyor..." -ForegroundColor Yellow
 docker compose up -d
 
 # 2. TimescaleDB hazır olana kadar bekle
@@ -19,7 +19,7 @@ do {
 } while ($status -ne "healthy")
 Write-Host "  TimescaleDB hazir!" -ForegroundColor Green
 
-# 3. Kafka hazır olana kadar bekle ve topic oluştur
+# 3. Kafka hazır olana kadar bekle ve topic olustur
 Write-Host "`n[3/7] Kafka bekleniyor..." -ForegroundColor Yellow
 $kafkaReady = $false
 $attempt = 0

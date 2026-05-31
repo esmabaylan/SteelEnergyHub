@@ -6,21 +6,29 @@ SteelEnergyHub is an end-to-end data engineering platform that analyzes real-tim
 ## Project Architecture
 
 ```
-CSV Data
+Synthetic Data Generator (generate_dummy_data.py)
     ↓
-TimescaleDB (main_data.energy_readings)
+TimescaleDB (main_data.energy_readings) — raw data
     ↓
-Kafka Producer (energy_producer.py)
+Feature Pipeline (feature_pipeline.py)
+    ↓
+TimescaleDB (main_data.processed_readings) — enriched data
+    ↓
+Kafka Producer (energyProducer.py)
     ↓
 Apache Kafka (energy_raw topic)
     ↓
 Spark Structured Streaming (energy_streaming.py)
     ↓
 TimescaleDB
-├── main_data.anomalies       (detected anomalies)
-└── main_data.cost_analysis   (tariff-based cost records)
+├── main_data.anomalies         (detected anomalies)
+└── main_data.cost_analysis     (tariff-based cost records)
     ↓
-Grafana Dashboard
+Grafana Dashboards
+├── Overview                    (management)
+├── Energy Analysis             (energy engineers)
+├── Anomaly Detection           (maintenance team)
+└── Cost Analysis               (finance)
 ```
 
 ## Technology Stack
@@ -39,7 +47,7 @@ Grafana Dashboard
 
 | Infrastructure | Docker & Docker Compose |
 
-| Development Environment | VS Code Dev Containers + Jupyter |
+| Notebook Environment | Jupyter (via Spark container) |
 
 ## Service URLs
 
@@ -55,13 +63,12 @@ Grafana Dashboard
 
 | TimescaleDB | localhost:5432 |
 
-## Setup
+## Quick Start
 
 ### Prerequisites
 
 - Docker Desktop (must be running)
-- Visual Studio Code
-- VS Code Extension: Dev Containers (Microsoft)
+- PowerShell (Windows)
 
 ### 1. Clone the Repository
 
@@ -70,90 +77,92 @@ git clone https://github.com/esmabaylan/SteelEnergyHub.git
 cd SteelEnergyHub
 ```
 
-### 2. Start Core Services
+### 2. Start the System
 
-Run the main `docker-compose.yml` to start Kafka, TimescaleDB, pgAdmin, and Grafana:
+Run the system startup script — this starts all services and opens a terminal for each process:
 
-```bash
-docker compose up -d
+```powershell
+.\run_system.ps1
 ```
 
-Verify all services are healthy:
+This script will:
+- Start all Docker services (Kafka, TimescaleDB, Grafana, pgAdmin, Spark)
+- Wait for TimescaleDB and Kafka to be healthy
+- Create the `energy_raw` Kafka topic
+- Open 4 terminals: dummy generator, feature pipeline, Kafka producer, Spark streaming
 
-```bash
-docker compose ps
+### 3. Load the Initial Dataset (first run only)
+
+```powershell
+docker exec spark_worker python /home/jovyan/work/scripts/load_data.py
 ```
 
-The `timescaledb` row should show `healthy`.
+### 4. Access the Services
 
-### 3. Open the Development Environment
+| Service | URL | Credentials |
 
-In VS Code, press `Ctrl+Shift+P` → select **"Dev Containers: Reopen in Container"**.
+| Grafana | http://localhost:3000 | admin / admin |
 
-VS Code will automatically build and start the Spark and Python environment.
+| Kafka UI | http://localhost:8090 | — |
 
-> **Important:** Always run `docker compose up -d` before opening the Dev Container. The Dev Container connects to the `steelenergy_network` created by the main compose file.
+| pgAdmin | http://localhost:8085 | admin@admin.com / admin |
 
-### 4. Load the Dataset
+| Jupyter | http://localhost:8888 | — |
 
-In the Dev Container terminal:
+### 5. Stop the System
 
-```bash
-python scripts/load_data.py
+```powershell
+docker compose down
 ```
 
-### 5. Start the Kafka Producer
-
-```bash
-python src/producer/energy_producer.py
-```
-
-### 6. Start Spark Streaming
-
-Open a new terminal:
-
-```bash
-python spark/streaming/energy_streaming.py
-```
+> **Note:** Use `docker compose down` (without `-v`) to preserve data. Use `docker compose down -v` only if you want to reset everything from scratch.
 
 ## Project Structure
 
 ```
 STEELENERGYHUB
-├── .devcontainer/
-│   ├── Dockerfile              # Spark + Python environment
-│   ├── devcontainer.json       # VS Code configuration
-│   └── docker-compose.yml      # Spark service
-├── config/                     # Configuration files
-├── data/
-│   └── raw/                    # Raw CSV data
 ├── database/
-│   ├── init/                   # Docker init SQL files
-│   ├── migrations/             # Schema versions (V001, V002, V003)
-│   └── config/                 # PostgreSQL configuration
+│   ├── init/                        # Auto-executed SQL on first startup
+│   │   ├── 00_enable_extractions.sql
+│   │   ├── 01_create_schemas.sql
+│   │   ├── 02_create_roles.sql
+│   │   ├── 03_initial_schema.sql
+│   │   ├── 04_anomaly_cost_tables.sql
+│   │   ├── 05_processed_readings.sql
+│   │   └── 06_create_hypertables.sql
+│   ├── migrations/                  # Schema version history
+│   └── config/                      # PostgreSQL configuration
+├── data/
+│   └── raw/                         # Raw CSV dataset
+├── grafana/
+│   ├── dashboards/                  # Dashboard JSON exports
+│   └── provisioning/                # Grafana datasource & dashboard config
 ├── notebooks/
 │   ├── 01_data_exploration.ipynb
 │   └── 02_feature_engineering.ipynb
 ├── spark/
 │   └── streaming/
-│       ├── energy_streaming.py # Kafka → Spark → DB pipeline
-│       └── kafka_consumer.py   # Kafka consumer test
+│       ├── energy_streaming.py      # Kafka → Spark → DB pipeline
+│       └── kafka_consumer.py        # Kafka consumer test
 ├── src/
-│   ├── anomaly/                # Anomaly detection modules
-│   ├── cost/                   # Cost analysis modules
+│   ├── anomaly/                     # Anomaly detection modules
+│   ├── cost/                        # Cost analysis modules
 │   ├── pipelines/
-│   │   └── feature_pipeline.py # energy_readings → processed_readings
+│   │   └── feature_pipeline.py      # energy_readings → processed_readings
 │   └── producer/
-│       ├── energyProducer.py   # processed_readings → Kafka
-│       └── generate_dummy_data.py # Synthetic data generator
+│       ├── energyProducer.py        # processed_readings → Kafka
+│       └── generate_dummy_data.py   # Synthetic sensor data generator
 ├── scripts/
-│   └── load_data.py            # CSV → DB loader
+│   └── load_data.py                 # CSV → DB initial loader
 ├── tests/
-│   ├── test_db.py
-│   ├── test_dummy_data.py
-│   ├── test_producer.py
-│   └── test_streaming_job.py
-├── docker-compose.yml          # Core services
+│   ├── test_db.py                   # Database connection & schema tests
+│   ├── test_dummy_data.py           # Data quality tests
+│   ├── test_producer.py             # Kafka producer tests
+│   └── test_streaming_job.py        # Spark streaming output tests
+├── Dockerfile                       # Spark + Python environment
+├── docker-compose.yml               # All services
+├── run_system.ps1                   # One-command system startup
+├── requirements.txt
 └── README.md
 ```
 
@@ -162,11 +171,34 @@ STEELENERGYHUB
 ```
 energydb
 └── main_data (schema)
-├── energy_readings     → raw energy data (hypertable)
-├── processed_readings  → feature engineered data (hypertable)
-├── anomalies           → detected anomalies (hypertable)
-└── cost_analysis       → tariff-based cost records (hypertable)
+    ├── energy_readings      → raw sensor data (hypertable)
+    ├── processed_readings   → feature engineered data (hypertable)
+    ├── anomalies            → detected anomalies (hypertable)
+    └── cost_analysis        → tariff-based cost records (hypertable)
 ```
+
+## Database Roles
+
+| Role | Permissions | Used By |
+
+| postgres | superuser | administration |
+
+| data_writer | INSERT, UPDATE, SELECT on main_data | Spark, Python scripts |
+
+| report_reader | SELECT on main_data | Grafana |
+
+
+## Grafana Dashboards
+
+| Dashboard | Folder | Target Audience |
+
+| Overview | Genel Bakış | Management |
+
+| Energy Analysis | Enerji Analizleri | Energy Engineers |
+
+| Anomaly Detection | Anomali Tespiti | Maintenance Team |
+
+| Cost Analysis | Maliyet Analizi | Finance |
 
 ## Connection Details
 
@@ -185,17 +217,25 @@ energydb
 
 | Read user | report_reader |
 
-### Grafana
+### Kafka
 | Parameter | Value |
 
-| URL | http://localhost:3000 |
+| Bootstrap server (inside Docker) | kafka:9092 |
 
-| Username | admin |
+| Topic | energy_raw |
 
-| Datasource | PostgreSQL → timescaledb:5432 |
+| UI | http://localhost:8090 |
+
+## Running Tests
+
+```powershell
+docker exec spark_worker python -m pytest /home/jovyan/work/tests/ -v
+```
 
 ## Developer Notes
 
-- If dependencies change, update `.devcontainer/Dockerfile` and run **"Rebuild Container"**.
-- Migration files are versioned under `database/migrations/` in `V001__`, `V002__` format.
-- Core services must always be started before opening the Dev Container.
+- Database tables and hypertables are created automatically on first `docker compose up -d`.
+- The `energy_raw` Kafka topic is created automatically by `run_system.ps1`.
+- Migration files under `database/migrations/` are for version history only — Docker uses `database/init/`.
+- To reset everything: `docker compose down -v` then `docker compose up -d`.
+```
