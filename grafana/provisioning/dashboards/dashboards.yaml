@@ -1,14 +1,1 @@
 apiVersion: 1
-
-providers:
-  - name: SteelEnergyHub
-    folder: SteelEnergyHub
-    type: file
-    options:
-      path: /var/lib/grafana/dashboards
-
-  - name: TestFolder
-    folder: Test Klasör
-    type: file
-    options:
-      path: /var/lib/grafana/dashboards/test

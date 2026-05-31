@@ -78,10 +78,19 @@ def extract_features(df):
     df['low_pf_flag']            = df['lagging_pf'] < 80
 
     # Anomali özellikleri
-    mean = df['usage_kwh'].mean()
-    std  = df['usage_kwh'].std() if df['usage_kwh'].std() > 0 else 1
-    df['z_score']  = (df['usage_kwh'] - mean) / std
-    df['z_anomaly'] = df['z_score'].abs() > 3
+    # Anomali özellikleri - sabit tarihsel istatistikler kullan
+    USAGE_MEAN = 27.39
+    USAGE_STD = 33.44
+
+    df['z_score'] = (df['usage_kwh'] - USAGE_MEAN) / USAGE_STD
+
+    # Spike (yüksek) VEYA Drop (çok düşük) anomali
+    df['z_anomaly'] = (df['z_score'] > 3) | (df['usage_kwh'] < 2.0)
+
+    #mean = df['usage_kwh'].mean()
+    #std  = df['usage_kwh'].std() if df['usage_kwh'].std() > 0 else 1
+    #df['z_score']  = (df['usage_kwh'] - mean) / std
+    #df['z_anomaly'] = df['z_score'].abs() > 3
 
     # Maliyet özellikleri
     df['cost_tl'] = df['tariff_period'].apply(

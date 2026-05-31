@@ -22,7 +22,7 @@ DB_CONFIG = {
     "options": "-c search_path=main_data"
 }
 
-INTERVAL_SEC = 5#15
+INTERVAL_SEC = 5 #15
 ANOMALY_RATE = 0.006
 
 DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"]
