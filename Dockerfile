@@ -24,5 +24,5 @@ ENV PATH=$JAVA_HOME/bin:$PATH
 ENV SPARK_JARS_DIR=/usr/local/spark/jars
 
 
-COPY . /home/jovyan/work
+COPY --chown=jovyan:users . /home/jovyan/work
 USER jovyan
