@@ -232,10 +232,51 @@ energydb
 docker exec spark_worker python -m pytest /home/jovyan/work/tests/ -v
 ```
 
+
+
+## Remote Access (Ngrok)
+
+To make the system accessible over the internet, use ngrok.
+
+### Prerequisites
+
+- Download ngrok: `https://ngrok.com/download`
+- Extract `ngrok.exe` to `C:\ngrok\`
+- Create a free account at `https://ngrok.com` and get your auth token
+
+### Setup (one-time)
+
+```powershell
+C:\ngrok\ngrok.exe config add-authtoken YOUR_TOKEN_HERE
+```
+
+### Start ngrok
+
+After running `run_system.ps1`, open a new terminal:
+
+```powershell
+C:\ngrok\ngrok.exe http 3000
+```
+
+You will see a public URL like:
+```
+Forwarding  https://abc123.ngrok-free.app → localhost:3000
+```
+
+Share this URL to allow others to access Grafana remotely.
+
+### Important Notes
+
+- The URL changes every time ngrok restarts (free plan)
+- ngrok must stay running for the URL to work
+- The system (Docker) must be running before starting ngrok
+- Grafana credentials remain the same: admin / admin
+```
+```
+
 ## Developer Notes
 
 - Database tables and hypertables are created automatically on first `docker compose up -d`.
 - The `energy_raw` Kafka topic is created automatically by `run_system.ps1`.
 - Migration files under `database/migrations/` are for version history only — Docker uses `database/init/`.
 - To reset everything: `docker compose down -v` then `docker compose up -d`.
-```

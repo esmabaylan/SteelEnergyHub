@@ -87,3 +87,9 @@ Write-Host "  Grafana   : http://localhost:3000" -ForegroundColor White
 Write-Host "  pgAdmin   : http://localhost:8085" -ForegroundColor White
 Write-Host ""
 Write-Host "Durdurmak icin: docker compose down" -ForegroundColor Gray
+
+# run_system.ps1 sonuna ekle
+Write-Host "`nNgrok baslatiliyor..." -ForegroundColor Yellow
+Start-Process powershell -ArgumentList "-NoExit", "-Command", `
+    "Write-Host 'NGROK' -ForegroundColor Cyan; C:\ngrok\ngrok.exe http 3000"
+Write-Host "  Ngrok terminali acildi." -ForegroundColor Green

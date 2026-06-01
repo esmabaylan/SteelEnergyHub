@@ -23,4 +23,6 @@ ENV JAVA_HOME=/usr/lib/jvm/java-17-openjdk-amd64
 ENV PATH=$JAVA_HOME/bin:$PATH
 ENV SPARK_JARS_DIR=/usr/local/spark/jars
 
+
+COPY . /home/jovyan/work
 USER jovyan
