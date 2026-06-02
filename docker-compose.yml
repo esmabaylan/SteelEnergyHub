@@ -47,7 +47,8 @@ services:
       environment:                                     
         POSTGRES_USER: postgres                        
         POSTGRES_PASSWORD: postgres                    
-        POSTGRES_DB: energydb                          
+        POSTGRES_DB: energydb      
+        TZ: "Europe/Istanbul"                    
       volumes:
       - timescale_data:/var/lib/postgresql/data
       - ./database/init:/docker-entrypoint-initdb.d
@@ -81,6 +82,7 @@ services:
       GF_SECURITY_ADMIN_USER: admin
       GF_SECURITY_ADMIN_PASSWORD: admin
       GF_PATHS_PROVISIONING: /etc/grafana/provisioning
+      TZ: "Europe/Istanbul"
     volumes:
       - grafana_data:/var/lib/grafana
       - ./grafana/provisioning:/etc/grafana/provisioning
@@ -103,6 +105,7 @@ services:
     environment:
       JAVA_OPTS: "-XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=512m"
       SPARK_DRIVER_MEMORY: "2g"
+      TZ: "Europe/Istanbul"
     deploy:
       resources:
         limits:

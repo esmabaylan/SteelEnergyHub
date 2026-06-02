@@ -32,6 +32,7 @@ spark = SparkSession.builder \
     .config("spark.sql.shuffle.partitions", "2") \
     .config("spark.driver.memory", "2g") \
     .config("spark.executor.memory", "2g") \
+    .config("spark.sql.session.timeZone", "Europe/Istanbul") \
     .getOrCreate()
 
 spark.sparkContext.setLogLevel("WARN")
