@@ -30,6 +30,9 @@ spark = SparkSession.builder \
     .config("spark.driver.extraClassPath", "/usr/local/spark/jars/*") \
     .config("spark.executor.extraClassPath", "/usr/local/spark/jars/*") \
     .config("spark.sql.shuffle.partitions", "2") \
+    .config("spark.driver.memory", "2g") \
+    .config("spark.driver.extraJavaOptions", 
+            "-XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=512m") \
     .getOrCreate()
 
 spark.sparkContext.setLogLevel("WARN")

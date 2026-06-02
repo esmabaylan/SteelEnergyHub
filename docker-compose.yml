@@ -88,7 +88,7 @@ services:
       - steelenergy_network
 
   spark:
-    build: 
+    build:
       context: .
       dockerfile: Dockerfile
     container_name: spark_worker
@@ -97,6 +97,13 @@ services:
       - "4041:4040"
     volumes:
       - .:/home/jovyan/work
+    environment:
+      JAVA_OPTS: "-XX:MetaspaceSize=256m -XX:MaxMetaspaceSize=512m"
+      SPARK_DRIVER_MEMORY: "2g"
+    deploy:
+      resources:
+        limits:
+          memory: 4g
     command: >
       start-notebook.py
       --ServerApp.root_dir='/home/jovyan/work'

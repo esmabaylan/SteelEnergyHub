@@ -3,6 +3,9 @@ import pandas as pd
 import psycopg2
 from psycopg2.extras import execute_batch
 from datetime import datetime, timedelta
+from pyspark.sql.functions import (
+    from_json, col, avg, stddev, when, lit, current_timestamp, hour, from_utc_timestamp
+)
 
 DB_CONFIG = {
     "host": "timescaledb",
