@@ -159,7 +159,7 @@ def process_batch(batch_df, batch_id):
 query = df.writeStream \
     .outputMode("append") \
     .foreachBatch(process_batch) \
-    .option("checkpointLocation", "/tmp/spark_checkpoint") \
+    .option("checkpointLocation", "/home/jovyan/work/spark_checkpoint") \
     .start()
 
 print("Spark Streaming started — Listening to Kafka...")
